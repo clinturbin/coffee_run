@@ -1,0 +1,21 @@
+.order {
+    display: flex;
+    border-top: 1px solid lightgray;
+    margin-top: 10px;
+    padding-left: 10px;
+}
+
+.order-summary {
+    flex: 3;
+}
+
+.order-summary p {
+    margin: 0;
+}
+
+.order-complete {
+    flex: 1;
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+}
