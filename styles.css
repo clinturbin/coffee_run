@@ -19,3 +19,9 @@
     justify-content: space-evenly;
     align-items: center;
 }
+
+.pending-orders > p {
+    font-weight: bold;
+    font-size: 1.2em;
+    padding: .5em;
+}
