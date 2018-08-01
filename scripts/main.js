@@ -1,20 +1,28 @@
 var coffeeOrderForm = document.querySelector('[data-coffee-order="form"]');
 var pendingOrders = document.querySelector(".pending-orders");
 var coffeeOrders = [];
+var serverURL = 'https://dc-coffeerun.herokuapp.com/api/coffeeorders';
 
-var addOrdersToLocalStorage = function () {
-    var ordersAsString = JSON.stringify(coffeeOrders);
-    localStorage.setItem('coffee-orders', ordersAsString);
+var getOrdersFromServer = function () {
+    coffeeOrders = [];
+    $.ajax(serverURL, {
+        success: function (data) {
+            for (key in data) {
+                coffeeOrders.push(data[key]);
+            }
+            updatePendingOrders();
+        }
+    });
 };
 
-var getOrdersFromLocalStorage = function () {
-    var ordersAsString = localStorage.getItem('coffee-orders');
-    var ordersAsObjects = JSON.parse(ordersAsString);
-    if (ordersAsObjects !== null) {
-        ordersAsObjects.forEach(function (order) {
-            coffeeOrders.push(order);    
-        });
-    };
+var addOrderToServer = function (order) {
+    $.ajax(serverURL, {
+        method: 'POST',
+        data: order,
+        success: function () {
+            getOrdersFromServer();
+        }
+    });
 };
 
 var clearPendingOrdersDisplay = function () {
@@ -26,18 +34,17 @@ var clearPendingOrdersDisplay = function () {
 
 var updatePendingOrders = function () {
     clearPendingOrdersDisplay();
-    coffeeOrders.forEach(function (element, index) {
-        pendingOrders.appendChild(pendingOrder(element, index));
+    coffeeOrders.forEach(function (order) {
+        pendingOrders.appendChild(pendingOrder(order));
     });
-    addOrdersToLocalStorage();
 };
 
 //---------------------  Conatiner for Each Pending Order --------------------------------
-var pendingOrder = function (order, index) {
+var pendingOrder = function (order) {
     var newOrder = document.createElement('div');
     newOrder.classList.add('order');
     newOrder.appendChild(orderSummary(order));
-    newOrder.appendChild(orderCompleteContainer(index));
+    newOrder.appendChild(orderCompleteContainer(order));
     return newOrder;
 };
 
@@ -61,42 +68,45 @@ var orderSummaryCoffee = function (order) {
 var orderSummaryDetails = function (order) {
     var orderDetails = document.createElement("div");
     orderDetails.classList.add("order-summary-details");
-    orderDetails.textContent = `${order.size}    |   ${order.flavor}   |   ${order.caffeine}`;
+    orderDetails.textContent = `${order.size}    |   ${order.flavor}   |   ${order.strength}`;
     return orderDetails;
 };
 
 var orderSummaryEmail = function (order) {
     var orderEmail = document.createElement("div");
     orderEmail.classList.add("order-summary-email");
-    orderEmail.textContent = order.email;
+    orderEmail.textContent = order.emailAddress;
     return orderEmail;
 };
 
 //---------------------------------------------------------------------------
-var orderCompleteContainer = function (index) {
+var orderCompleteContainer = function (order) {
     var inputContainer = document.createElement("div");
     inputContainer.classList.add("order-complete");
-    var completeButton = newCompleteButton(index);
+    var completeButton = newCompleteButton(order);
     inputContainer.appendChild(completeButton);
     return inputContainer;
 };
 
-var newCompleteButton = function (index) {
+var newCompleteButton = function (order) {
     var completeButton = document.createElement("input");
     completeButton.classList.add("complete-btn");
     completeButton.setAttribute("type", "button");
     completeButton.setAttribute("value", "Complete");
     completeButton.addEventListener('click', function () {
-        coffeeOrders.splice(index, 1);
-        updatePendingOrders();
+        $.ajax(serverURL + "/" + order.emailAddress, {
+            method: 'DELETE',
+            success: function () {
+                getOrdersFromServer();
+            }
+        });
     });
     return completeButton;
 };
 
 // -------------------------------------------------------------------------------------
 
-getOrdersFromLocalStorage();
-updatePendingOrders();
+getOrdersFromServer();
 
 coffeeOrderForm.addEventListener('submit', function (event) {
     event.preventDefault();
@@ -105,12 +115,11 @@ coffeeOrderForm.addEventListener('submit', function (event) {
     var flavorShot = document.querySelector("[name='flavor']").value;
     var caffeineRating = document.querySelector("[name='strength']").value;
     var coffeeSize = document.querySelector('[name="size"]:checked').value;
-    var newOrder = {'coffee'  : coffeeOrdered,
-                    'email'   : orderEmail,
-                    'flavor'  : flavorShot,
-                    'size'    : coffeeSize,
-                    'caffeine': caffeineRating
+    var newOrder = {'coffee': coffeeOrdered,
+                    'emailAddress': orderEmail,
+                    'flavor': flavorShot,
+                    'size': coffeeSize,
+                    'strength': caffeineRating
                    };
-    coffeeOrders.push(newOrder);
-    updatePendingOrders();
+    addOrderToServer(newOrder);
 });
