@@ -3,6 +3,9 @@ var pendingOrders = document.querySelector(".pending-orders");
 var coffeeOrders = [];
 var serverURL = 'https://dc-coffeerun.herokuapp.com/api/coffeeorders';
 
+
+//------------ GET, POST, DELETE orders from server  ------------------------------------
+
 var getOrdersFromServer = function () {
     coffeeOrders = [];
     $.ajax(serverURL, {
@@ -24,6 +27,17 @@ var addOrderToServer = function (order) {
         }
     });
 };
+
+var deleteOrderFromServer = function (order) {
+    $.ajax(serverURL + "/" + order.emailAddress, {
+        method: 'DELETE',
+        success: function () {
+            getOrdersFromServer();
+        }
+    });
+};
+
+//----------------------------------------------------------------------------------------
 
 var clearPendingOrdersDisplay = function () {
     var orders = document.querySelectorAll('.order');
@@ -49,6 +63,7 @@ var pendingOrder = function (order) {
 };
 
 //------------ Order Summary Section includes information from input form ----------------
+
 var orderSummary = function (order) {
     var orderSummary = document.createElement('div');
     orderSummary.classList.add('order-summary');
@@ -79,7 +94,7 @@ var orderSummaryEmail = function (order) {
     return orderEmail;
 };
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------
 var orderCompleteContainer = function (order) {
     var inputContainer = document.createElement("div");
     inputContainer.classList.add("order-complete");
@@ -94,17 +109,16 @@ var newCompleteButton = function (order) {
     completeButton.setAttribute("type", "button");
     completeButton.setAttribute("value", "Complete");
     completeButton.addEventListener('click', function () {
-        this.parentElement.parentElement.classList.add('completed');
-        setTimeout(function () {
-            $.ajax(serverURL + "/" + order.emailAddress, {
-                method: 'DELETE',
-                success: function () {
-                    getOrdersFromServer();
-                }
-            });
-        }, 2000);
+        completeButtonClicked(this, order);
     });
     return completeButton;
+};
+
+var completeButtonClicked = function (button, order) {
+    button.parentElement.parentElement.classList.add('completed');
+    setTimeout(function () {
+        deleteOrderFromServer(order);
+    }, 2000);
 };
 
 // -------------------------------------------------------------------------------------
