@@ -3,9 +3,6 @@ var pendingOrders = document.querySelector(".pending-orders");
 var coffeeOrders = [];
 var serverURL = 'https://dc-coffeerun.herokuapp.com/api/coffeeorders';
 
-
-//------------ GET, POST, DELETE orders from server  ------------------------------------
-
 var getOrdersFromServer = function () {
     coffeeOrders = [];
     $.ajax(serverURL, {
@@ -37,8 +34,6 @@ var deleteOrderFromServer = function (order) {
     });
 };
 
-//----------------------------------------------------------------------------------------
-
 var clearPendingOrdersDisplay = function () {
     var orders = document.querySelectorAll('.order');
     orders.forEach( function (element) {
@@ -53,7 +48,6 @@ var updatePendingOrders = function () {
     });
 };
 
-//---------------------  Conatiner for Each Pending Order --------------------------------
 var pendingOrder = function (order) {
     var newOrder = document.createElement('div');
     newOrder.classList.add('order');
@@ -61,8 +55,6 @@ var pendingOrder = function (order) {
     newOrder.appendChild(orderCompleteContainer(order));
     return newOrder;
 };
-
-//------------ Order Summary Section includes information from input form ----------------
 
 var orderSummary = function (order) {
     var orderSummary = document.createElement('div');
@@ -94,7 +86,6 @@ var orderSummaryEmail = function (order) {
     return orderEmail;
 };
 
-//----------------------------------------------------------------------------------------
 var orderCompleteContainer = function (order) {
     var inputContainer = document.createElement("div");
     inputContainer.classList.add("order-complete");
@@ -120,8 +111,6 @@ var completeButtonClicked = function (button, order) {
         deleteOrderFromServer(order);
     }, 2000);
 };
-
-// -------------------------------------------------------------------------------------
 
 getOrdersFromServer();
 
