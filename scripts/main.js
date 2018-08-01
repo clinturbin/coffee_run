@@ -94,12 +94,15 @@ var newCompleteButton = function (order) {
     completeButton.setAttribute("type", "button");
     completeButton.setAttribute("value", "Complete");
     completeButton.addEventListener('click', function () {
-        $.ajax(serverURL + "/" + order.emailAddress, {
-            method: 'DELETE',
-            success: function () {
-                getOrdersFromServer();
-            }
-        });
+        this.parentElement.parentElement.classList.add('completed');
+        setTimeout(function () {
+            $.ajax(serverURL + "/" + order.emailAddress, {
+                method: 'DELETE',
+                success: function () {
+                    getOrdersFromServer();
+                }
+            });
+        }, 2000);
     });
     return completeButton;
 };

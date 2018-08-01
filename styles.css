@@ -25,3 +25,7 @@
     font-size: 1.2em;
     padding: .5em;
 }
+
+.completed {
+    background-color: rgba(4, 229, 68, 0.84);
+}
