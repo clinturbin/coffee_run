@@ -17,13 +17,13 @@ var getOrdersFromServer = function () {
     });
 };
 
-var addOrderToServer = function (order) {
-    $.ajax(serverURL, {
+var addOrderToServer = function (order) { //order here is an object of order information
+    fetch(serverURL, {
         method: 'POST',
-        data: order,
-        success: function () {
-            getOrdersFromServer();
-        }
+        headers: {"Content-Type": "application/json; charset=utf-8",},
+        body: JSON.stringify(order),
+    }).then(function (response) {
+        getOrdersFromServer();
     });
 };
 
