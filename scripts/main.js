@@ -5,13 +5,15 @@ var serverURL = 'https://dc-coffeerun.herokuapp.com/api/coffeeorders';
 
 var getOrdersFromServer = function () {
     coffeeOrders = [];
-    $.ajax(serverURL, {
-        success: function (data) {
-            for (key in data) {
-                coffeeOrders.push(data[key]);
+    var cofeeOrdersPromise = fetch(serverURL);
+    cofeeOrdersPromise.then(function(response) {
+        var toJSONPromise = response.json();
+        toJSONPromise.then(function(orders) {
+            for (key in orders) {
+                coffeeOrders.push(orders[key]);
             }
             updatePendingOrders();
-        }
+        });
     });
 };
 
