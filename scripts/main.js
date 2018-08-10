@@ -28,11 +28,10 @@ var addOrderToServer = function (order) { //order here is an object of order inf
 };
 
 var deleteOrderFromServer = function (order) {
-    $.ajax(serverURL + "/" + order.emailAddress, {
+    fetch(serverURL + "/" + order.emailAddress, {
         method: 'DELETE',
-        success: function () {
-            getOrdersFromServer();
-        }
+    }).then(function(response) {
+        getOrdersFromServer();
     });
 };
 
