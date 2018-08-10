@@ -5,32 +5,33 @@ var serverURL = 'https://dc-coffeerun.herokuapp.com/api/coffeeorders';
 
 var getOrdersFromServer = function () {
     coffeeOrders = [];
-    $.ajax(serverURL, {
-        success: function (data) {
-            for (key in data) {
-                coffeeOrders.push(data[key]);
+    var cofeeOrdersPromise = fetch(serverURL);
+    cofeeOrdersPromise.then(function(response) {
+        var toJSONPromise = response.json();
+        toJSONPromise.then(function(orders) {
+            for (key in orders) {
+                coffeeOrders.push(orders[key]);
             }
             updatePendingOrders();
-        }
+        });
     });
 };
 
-var addOrderToServer = function (order) {
-    $.ajax(serverURL, {
+var addOrderToServer = function (order) { //order here is an object of order information
+    fetch(serverURL, {
         method: 'POST',
-        data: order,
-        success: function () {
-            getOrdersFromServer();
-        }
+        headers: {"Content-Type": "application/json; charset=utf-8",},
+        body: JSON.stringify(order),
+    }).then(function (response) {
+        getOrdersFromServer();
     });
 };
 
 var deleteOrderFromServer = function (order) {
-    $.ajax(serverURL + "/" + order.emailAddress, {
+    fetch(serverURL + "/" + order.emailAddress, {
         method: 'DELETE',
-        success: function () {
-            getOrdersFromServer();
-        }
+    }).then(function(response) {
+        getOrdersFromServer();
     });
 };
 
